@@ -16,26 +16,40 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
-      - name: Extract version from module.json
-        id: get_version
+      - name: Check if version changed
+        id: check_version
         run: |
-          VERSION=$(jq -r '.version' module.json)
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-          echo "Detected version: $VERSION"
+          CURRENT_VERSION=$(jq -r '.version' module.json)
+          PREVIOUS_VERSION=$(git show HEAD~1:module.json | jq -r '.version')
+
+          echo "Current version: $CURRENT_VERSION"
+          echo "Previous version: $PREVIOUS_VERSION"
+
+          if [ "$CURRENT_VERSION" != "$PREVIOUS_VERSION" ]; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "VERSION=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+            echo "Version changed from $PREVIOUS_VERSION to $CURRENT_VERSION"
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Version unchanged, skipping release"
+          fi
 
       - name: Check if tag exists
+        if: steps.check_version.outputs.changed == 'true'
         id: check_tag
         run: |
-          if git rev-parse "v${{ steps.get_version.outputs.VERSION }}" >/dev/null 2>&1; then
+          if git rev-parse "v${{ steps.check_version.outputs.VERSION }}" >/dev/null 2>&1; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "Tag v${{ steps.get_version.outputs.VERSION }} already exists, skipping release"
+            echo "Tag v${{ steps.check_version.outputs.VERSION }} already exists, skipping release"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Create module package
-        if: steps.check_tag.outputs.exists == 'false'
+        if: steps.check_version.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
         run: |
           mkdir -p combat-tracker-extensions
 
@@ -57,14 +71,14 @@ jobs:
           cd ..
 
       - name: Create Release
-        if: steps.check_tag.outputs.exists == 'false'
+        if: steps.check_version.outputs.changed == 'true' && steps.check_tag.outputs.exists == 'false'
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ steps.get_version.outputs.VERSION }}
-          name: Release v${{ steps.get_version.outputs.VERSION }}
+          tag_name: v${{ steps.check_version.outputs.VERSION }}
+          name: Release v${{ steps.check_version.outputs.VERSION }}
           files: combat-tracker-extensions.zip
           body: |
-            ## Combat Tracker Extensions v${{ steps.get_version.outputs.VERSION }}
+            ## Combat Tracker Extensions v${{ steps.check_version.outputs.VERSION }}
 
             See [changelog.md](https://github.com/${{ github.repository }}/blob/main/changelog.md) for details.
 

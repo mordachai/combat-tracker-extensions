@@ -1,0 +1,57 @@
+name: Release Module
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create module package
+        run: |
+          mkdir -p combat-tracker-extensions
+
+          # Copy necessary files and directories
+          cp module.json combat-tracker-extensions/
+          cp LICENSE combat-tracker-extensions/
+          cp readme.md combat-tracker-extensions/
+          cp changelog.md combat-tracker-extensions/
+
+          # Copy directories
+          cp -r scripts combat-tracker-extensions/
+          cp -r templates combat-tracker-extensions/
+          cp -r styles combat-tracker-extensions/
+          cp -r languages combat-tracker-extensions/
+
+          # Create zip file
+          cd combat-tracker-extensions
+          zip -r ../combat-tracker-extensions.zip .
+          cd ..
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: combat-tracker-extensions.zip
+          body: |
+            ## Combat Tracker Extensions ${{ steps.get_version.outputs.VERSION }}
+
+            See [changelog.md](https://github.com/${{ github.repository }}/blob/main/changelog.md) for details.
+
+            ### Installation
+            1. Download `combat-tracker-extensions.zip`
+            2. Extract to your Foundry VTT `Data/modules/` directory
+            3. Enable the module in your world's module settings
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

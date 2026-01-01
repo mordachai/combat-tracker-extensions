@@ -1,4 +1,4 @@
-![Supported Foundry Versions](https://img.shields.io/endpoint?url=https://foundryshields.com/version?url=https://raw.githubusercontent.com/Anderware/Combat-Tracker-Extensions/main/module.json&style=for-the-badge)![Supported Game Systems](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fsystem%3FnameType%3Dfull%26showVersion%3D1%26style%3Dfor-the-badge%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2FAnderware%2FCombat-Tracker-Extensions%2Fmain%2Fmodule.json)![GitHub Release](https://img.shields.io/github/v/release/Anderware/Combat-Tracker-Extensions?style=for-the-badge&label=Latest%20release&color=%23ff6400)
+![Supported Foundry Versions](https://img.shields.io/endpoint?url=https://foundryshields.com/version?url=https://raw.githubusercontent.com/mordachai/combat-tracker-extensions/main/module.json&style=for-the-badge)![Supported Game Systems](https://img.shields.io/endpoint?url=https%3A%2F%2Ffoundryshields.com%2Fsystem%3FnameType%3Dfull%26showVersion%3D1%26style%3Dfor-the-badge%26url%3Dhttps%3A%2F%2Fraw.githubusercontent.com%2Fmordachai%2Fcombat-tracker-extensions%2Fmain%2Fmodule.json)![GitHub Release](https://img.shields.io/github/v/release/mordachai/combat-tracker-extensions?style=for-the-badge&label=Latest%20release&color=%23ff6400)
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/ramses800) 
 
@@ -57,7 +57,7 @@ Adds features to the standard Combat Tracker like name hiding, hide/obscure init
 
 [Ramses800(Ramses800#8517)@Foundry Discord Server](https://discordapp.com/users/783401137281564692)
 
-[Discussion on GitHub](https://github.com/Anderware/Combat-Tracker-Extensions/discussions)
+[Discussion on GitHub](https://github.com/mordachai/combat-tracker-extensions/discussions)
 
 ## Combat Tracker Extensions Basic User Interface
 

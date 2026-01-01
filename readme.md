@@ -6,6 +6,17 @@ This is the original author Ko-fi, give him your appreciation, I've only updated
 
 -----
 
+## IMPORTANT: URL MANIFEST FOR THIS V13 VERSION:
+
+```
+https://raw.githubusercontent.com/mordachai/combat-tracker-extensions/main/module.json
+
+```
+
+The original version available in Foundry modules page its not compatible with the last Foundry's version. I did a pull request to Andersware, if he opt to merge it I'll probaly kill this version and we can keep using his.
+
+-----
+
 # Combat Tracker Extensions
 
 A system-agnostic FoundryVTT module for modifying and extending the standard Combat Tracker.

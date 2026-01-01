@@ -66,13 +66,17 @@ export function wrappedOnHoverIn(wrapped, event, options) {
   wrapped(event, options);
   const combatant = this.combatant;
   if (combatant) {
-    const tracker = document.getElementById("combat-tracker");
-    _getCombatantsSharingToken(combatant)
-            .forEach(cb => {
-              const li = tracker.querySelector(`.combatant[data-combatant-id="${cb.id}"]`);
-              if (li)
-                li.classList.add("hover");
-            });
+    const tracker = document.querySelector("#combat, #combat-popout");
+    if (tracker) {
+      _getCombatantsSharingToken(combatant)
+              .forEach(cb => {
+                if (cb && cb.id) {
+                  const li = tracker.querySelector(`.combatant[data-combatant-id="${cb.id}"]`);
+                  if (li)
+                    li.classList.add("hover");
+                }
+              });
+    }
   }
 }
 
@@ -82,13 +86,17 @@ export function wrappedOnHoverOut(wrapped, event) {
 
   const combatant = this.combatant;
   if (combatant) {
-    const tracker = document.getElementById("combat-tracker");
-    _getCombatantsSharingToken(combatant)
-            .forEach(cb => {
-              const li = tracker.querySelector(`.combatant[data-combatant-id="${cb.id}"]`);
-              if (li)
-                li.classList.remove("hover");
-            });
+    const tracker = document.querySelector("#combat, #combat-popout");
+    if (tracker) {
+      _getCombatantsSharingToken(combatant)
+              .forEach(cb => {
+                if (cb && cb.id) {
+                  const li = tracker.querySelector(`.combatant[data-combatant-id="${cb.id}"]`);
+                  if (li)
+                    li.classList.remove("hover");
+                }
+              });
+    }
   }
 }
 
@@ -107,54 +115,30 @@ export function _getCombatantsSharingToken(combatant) {
 
 
 
-export function wrappedDisplayScrollingStatus(wrapped,enabled) {  
+export function wrappedDisplayScrollingStatus(wrapped,enabled) {
   const OPTION_CANVAS_TOKEN_HIDE_TOKEN_EFFECTS_FOR_PLAYERS = getModuleSetting(moduleId, SETTINGATTRIBUTE.OPTION_CANVAS_TOKEN_HIDE_TOKEN_EFFECTS_FOR_PLAYERS.ID);
-    if (isNewerVersion(game.version, 11)) {
-      // v11
-      if (!(this.statuses.size || this.changes.length))
-        return;
-      const actor = this.target;
-      const tokens = actor.getActiveTokens(true);
-      const text = `${enabled ? "+" : "-"}(${this.name})`;
-      for (let t of tokens) {
-        if (!t.visible || !t.renderable)
-          continue;
-        if((OPTION_CANVAS_TOKEN_HIDE_TOKEN_EFFECTS_FOR_PLAYERS && !game.user.isGM) && !t.isOwner)
-          continue;
-        canvas.interface.createScrollingText(t.center, text, {
-          anchor: CONST.TEXT_ANCHOR_POINTS.CENTER,
-          direction: enabled ? CONST.TEXT_ANCHOR_POINTS.TOP : CONST.TEXT_ANCHOR_POINTS.BOTTOM,
-          distance: (2 * t.h),
-          fontSize: 28,
-          stroke: 0x000000,
-          strokeThickness: 4,
-          jitter: 0.25
-        });
-      }
-    } else {
-      // v 10
-      if (!(this.flags.core?.statusId || this.changes.length))
-        return;
-      const actor = this.parent;
-      const tokens = actor.isToken ? [actor.token?.object] : actor.getActiveTokens(true);
-      const label = `${enabled ? "+" : "-"}(${this.label})`;
-      for (let t of tokens) {
-        if (!t.visible || !t.renderable)
-          continue;
-        if((OPTION_CANVAS_TOKEN_HIDE_TOKEN_EFFECTS_FOR_PLAYERS && !game.user.isGM) && !t.isOwner)
-          continue;
-        canvas.interface.createScrollingText(t.center, label, {
-          anchor: CONST.TEXT_ANCHOR_POINTS.CENTER,
-          direction: enabled ? CONST.TEXT_ANCHOR_POINTS.TOP : CONST.TEXT_ANCHOR_POINTS.BOTTOM,
-          distance: (2 * t.h),
-          fontSize: 28,
-          stroke: 0x000000,
-          strokeThickness: 4,
-          jitter: 0.25
-        });
-      }
-    }
-  
+
+  // v13+ version
+  if (!(this.statuses.size || this.changes.length))
+    return;
+  const actor = this.target;
+  const tokens = actor.getActiveTokens(true);
+  const text = `${enabled ? "+" : "-"}(${this.name})`;
+  for (let t of tokens) {
+    if (!t.visible || !t.renderable)
+      continue;
+    if((OPTION_CANVAS_TOKEN_HIDE_TOKEN_EFFECTS_FOR_PLAYERS && !game.user.isGM) && !t.isOwner)
+      continue;
+    canvas.interface.createScrollingText(t.center, text, {
+      anchor: CONST.TEXT_ANCHOR_POINTS.CENTER,
+      direction: enabled ? CONST.TEXT_ANCHOR_POINTS.TOP : CONST.TEXT_ANCHOR_POINTS.BOTTOM,
+      distance: (2 * t.h),
+      fontSize: 28,
+      stroke: 0x000000,
+      strokeThickness: 4,
+      jitter: 0.25
+    });
+  }
 }
 
 
@@ -206,43 +190,4 @@ export function wrappedDisplayScrollingStatus(wrapped,enabled) {
       return true;
     }
     return false;
-  }
-  
-  
-  
-  // ----------------------------------------------------------
-  // the only reason for this override is a bug in v11
-  // https://github.com/foundryvtt/foundryvtt/issues/9718
-  // ----------------------------------------------------------
-  export async function wrappedManageTurnEvents(adjustedTurn) {
-    if ( !game.users.activeGM?.isSelf ) return;
-    // --------------------------------------------------------------
-    // EDITED
-    // Original line:
-    // const prior = this.combatants.get(this.previous.combatantId);
-    // Fixed line:
-    const prior = this.combatants.get(this.previous?.combatantId);
-    // END OF EDIT
-    // --------------------------------------------------------------
-    
-    // Adjust the turn order before proceeding. Used for embedded document workflows
-    if ( Number.isNumeric(adjustedTurn) ) await this.update({turn: adjustedTurn}, {turnEvents: false});
-    if ( !this.started ) return;
-
-    // Identify what progressed
-    const advanceRound = this.current.round > (this.previous.round ?? -1);
-    const advanceTurn = this.current.turn > (this.previous.turn ?? -1);
-    if ( !(advanceTurn || advanceRound) ) return;
-
-    // Conclude prior turn
-    if ( prior ) await this._onEndTurn(prior);
-
-    // Conclude prior round
-    if ( advanceRound && (this.previous.round !== null) ) await this._onEndRound();
-
-    // Begin new round
-    if ( advanceRound ) await this._onStartRound();
-
-    // Begin a new turn
-    await this._onStartTurn(this.combatant);
   }

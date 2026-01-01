@@ -27,7 +27,7 @@ export class GroupEditorForm extends FormApplication {
       this.groupid = foundry.utils.randomID();
       this.groupcolor = stringToColor(this.groupid);
     } else {
-      const combat = game.combats.apps[0].viewed;
+      const combat = game.combats.apps[0]?.combat;
       const initiativeGroups = getInitiativeGroups(combat);
       if (initiativeGroups != null) {
         const initiativeGroup = initiativeGroups.find(y => y.id == this.groupid);
@@ -67,7 +67,7 @@ export class GroupEditorForm extends FormApplication {
 
   getData(options) {
     const OPTION_COMBAT_TRACKER_USE_ACTOR_PORTRAITS_FOR_GMS = getModuleSetting(moduleId, SETTINGATTRIBUTE.OPTION_COMBAT_TRACKER_USE_ACTOR_PORTRAITS_FOR_GMS.ID);
-    const combat = game.combats.apps[0].viewed;
+    const combat = game.combats.apps[0]?.combat;
     const combatants = getInitiativeGroupCombatants(combat, this.groupid);
 
     let members = [];
@@ -127,7 +127,7 @@ export class GroupEditorForm extends FormApplication {
     event.stopPropagation();
     const combatTracker = game.combats.apps[0];
     const combatantId = event.target.getAttribute("data-combatant-id");
-    const combatant = combatTracker.viewed.combatants.get(combatantId);
+    const combatant = combatTracker.combat.combatants.get(combatantId);
     await leaveInitiativeGroup(combatant);
     this.render(true);
   }
@@ -143,7 +143,7 @@ export class GroupEditorForm extends FormApplication {
       return 0;
     }
     const combatTracker = game.combats.apps[0];
-    const combat = combatTracker.viewed;
+    const combat = combatTracker.combat;
     const combatants = combat.combatants.filter(y => (y.flags?.combattrackerextensions?.initiativegroup?.id == this.groupid));
     // remove all members
     for (var i = 0; i < combatants.length; i++) {
@@ -167,7 +167,7 @@ export class GroupEditorForm extends FormApplication {
       sharesinitiative: sharesInitiative
     };
     const combatTracker = game.combats.apps[0];
-    const combat = combatTracker.viewed;
+    const combat = combatTracker.combat;
     let initiativeGroups = getInitiativeGroups(combat);
     let initiativeGroupExists = initiativeGroups.find(y => y.id == this.groupid);
     if (initiativeGroupExists == null) {

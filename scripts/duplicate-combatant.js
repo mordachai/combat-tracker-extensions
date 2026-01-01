@@ -13,13 +13,15 @@ export function wrappedOnHoverIn(wrapped, event, options) {
   wrapped(event, options);
   const combatant = this.combatant;
   if (combatant) {
-    const tracker = document.getElementById("combat-tracker");
-    _getCombatantsSharingToken(combatant)
-            .forEach(cb => {
-              const li = tracker.querySelector(`.combatant[data-combatant-id="${cb.id}"]`);
-              if (li)
-                li.classList.add("hover");
-            });
+    const tracker = document.querySelector("#combat");
+    if (tracker) {
+      _getCombatantsSharingToken(combatant)
+              .forEach(cb => {
+                const li = tracker.querySelector(`.combatant[data-combatant-id="${cb.id}"]`);
+                if (li)
+                  li.classList.add("hover");
+              });
+    }
   }
 }
 
@@ -29,13 +31,15 @@ export function wrappedOnHoverOut(wrapped, event) {
 
   const combatant = this.combatant;
   if (combatant) {
-    const tracker = document.getElementById("combat-tracker");
-    _getCombatantsSharingToken(combatant)
-            .forEach(cb => {
-              const li = tracker.querySelector(`.combatant[data-combatant-id="${cb.id}"]`);
-              if (li)
-                li.classList.remove("hover");
-            });
+    const tracker = document.querySelector("#combat");
+    if (tracker) {
+      _getCombatantsSharingToken(combatant)
+              .forEach(cb => {
+                const li = tracker.querySelector(`.combatant[data-combatant-id="${cb.id}"]`);
+                if (li)
+                  li.classList.remove("hover");
+              });
+    }
   }
 }
 
@@ -52,8 +56,8 @@ export function wrappedGetEntryContextOptions() {
       name: "Duplicate Combatant",
       icon: '<i class="far fa-copy"></i>',
       callback: async (li) => {
-        const combatant = this.viewed.combatants.get(li.data("combatant-id"));
-        this.viewed.createEmbeddedDocuments("Combatant", [combatant]);
+        const combatant = this.combat.combatants.get(li.data("combatant-id"));
+        this.combat.createEmbeddedDocuments("Combatant", [combatant]);
       }
     },
     {
@@ -65,11 +69,11 @@ export function wrappedGetEntryContextOptions() {
       name: "COMBAT.CombatantClear",
       icon: '<i class="fas fa-undo"></i>',
       condition: li => {
-        const combatant = this.viewed.combatants.get(li.data("combatant-id"));
+        const combatant = this.combat.combatants.get(li.data("combatant-id"));
         return Number.isNumeric(combatant?.initiative);
       },
       callback: li => {
-        const combatant = this.viewed.combatants.get(li.data("combatant-id"));
+        const combatant = this.combat.combatants.get(li.data("combatant-id"));
         if (combatant)
           return combatant.update({initiative: null});
       }
@@ -78,16 +82,16 @@ export function wrappedGetEntryContextOptions() {
       name: "COMBAT.CombatantReroll",
       icon: '<i class="fas fa-dice-d20"></i>',
       callback: li => {
-        const combatant = this.viewed.combatants.get(li.data("combatant-id"));
+        const combatant = this.combat.combatants.get(li.data("combatant-id"));
         if (combatant)
-          return this.viewed.rollInitiative([combatant.id]);
+          return this.combat.rollInitiative([combatant.id]);
       }
     },
     {
       name: "COMBAT.CombatantRemove",
       icon: '<i class="fas fa-trash"></i>',
       callback: li => {
-        const combatant = this.viewed.combatants.get(li.data("combatant-id"));
+        const combatant = this.combat.combatants.get(li.data("combatant-id"));
         return combatant.delete();
       }
     },
@@ -95,7 +99,7 @@ export function wrappedGetEntryContextOptions() {
       name: "Remove All Duplicates",
       icon: '<i class="fas fa-trash"></i>',
       callback: li => {
-        const combatant = this.viewed.combatants.get(li.data("combatant-id"));
+        const combatant = this.combat.combatants.get(li.data("combatant-id"));
         _getCombatantsSharingToken(combatant)
                 .forEach(c => c.delete());
         return true;

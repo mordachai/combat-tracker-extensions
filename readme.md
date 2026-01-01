@@ -238,7 +238,7 @@ If a combatant has more active effects than can be displayed in the combat track
 
 ## Module Compatibility
 
-Foundry version 10, 11
+Foundry version 13+
 
 ## Module Definitions
 

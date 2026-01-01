@@ -13,7 +13,7 @@ https://raw.githubusercontent.com/mordachai/combat-tracker-extensions/main/modul
 
 ```
 
-The original version available in Foundry modules page its not compatible with the last Foundry's version. I did a pull request to Andersware, if he opt to merge it I'll probaly kill this version and we can keep using his.
+The original version available in Foundry modules page its not compatible with the current Foundry version. I did a pull request to Andersware, if he opt to merge it I'll probaly kill this version and we can keep using his.
 
 -----
 

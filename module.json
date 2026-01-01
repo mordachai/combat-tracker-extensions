@@ -2,7 +2,7 @@
   "id": "combat-tracker-extensions",
   "title": "Combat Tracker Extensions",
   "description": "Add features to Combat Tracker like name hiding, hide/obscure initiative/combatant based on type/disposition/visibility/ownership, reverse initiative order, groups, custom combat phases, multiple combatants for the same token and many more. All features optional and configurable. System-agnostic.",  
-  "version": "1.5.0",
+  "version": "1.5.1",
   "compatibility": {
     "minimum": "13",
     "maximum": "13",

@@ -18,10 +18,12 @@
   height: max-content;
   min-width: 150px;
   max-width: 360px;
-  background:var(--color-text-dark-header);
+  background: #1a1a1a; /* Solid fallback */
+  background: var(--color-text-dark-header, #1a1a1a); /* Use CSS var with fallback */
   border: 1px solid var(--color-border-dark);
   border-radius: 5px;
   color: var(--color-text-light-1);
+  opacity: 0.95; /* Slightly transparent for aesthetics but still readable */
 }
 
 #dropdown-menu ol.dropdown-items,

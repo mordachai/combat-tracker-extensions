@@ -36,12 +36,14 @@ export class ModuleSettingsForm extends FormApplication {
   static get defaultOptions() {
     const defaults = super.defaultOptions;
     const overrides = {
+      id: `module-settings-form-${moduleId}`,
+      classes: ['sheet'],
       height: 'auto',
       template: `modules/${moduleId}/templates/module-settings-form.hbs`,
-      //title: `Configure Module Settings`,
+      title: `${moduleTitle} Settings`,
       userId: game.userId,
       closeOnSubmit: false, // do not close when submitted
-      submitOnChange: false, // submit when any input changes 
+      submitOnChange: false, // submit when any input changes
       resizable: true,
       width: 600
     };
@@ -210,6 +212,14 @@ export class ModuleSettingsForm extends FormApplication {
 
       if (askForReload || requiresRender || requiresHardRender) {
         Hooks.call(`module-settings-form-${moduleId}.updateModuleSetting`, `${this.moduleId}`, {askForReload: askForReload, requiresRender: requiresRender, requiresHardRender: requiresHardRender});
+      }
+
+      // Provide user feedback
+      ui.notifications.info(`${moduleTitle} settings saved successfully.`);
+
+      // Optionally close the form if settings were saved
+      if (!askForReload && !requiresRender && !requiresHardRender) {
+        // this.close(); // Uncomment if you want to auto-close
       }
     }
   }

@@ -2,8 +2,10 @@ name: Release Module
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+    paths:
+      - 'module.json'
 
 jobs:
   build:
@@ -15,11 +17,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Extract version from tag
+      - name: Extract version from module.json
         id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        run: |
+          VERSION=$(jq -r '.version' module.json)
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "Detected version: $VERSION"
+
+      - name: Check if tag exists
+        id: check_tag
+        run: |
+          if git rev-parse "v${{ steps.get_version.outputs.VERSION }}" >/dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Tag v${{ steps.get_version.outputs.VERSION }} already exists, skipping release"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Create module package
+        if: steps.check_tag.outputs.exists == 'false'
         run: |
           mkdir -p combat-tracker-extensions
 
@@ -41,11 +57,14 @@ jobs:
           cd ..
 
       - name: Create Release
+        if: steps.check_tag.outputs.exists == 'false'
         uses: softprops/action-gh-release@v1
         with:
+          tag_name: v${{ steps.get_version.outputs.VERSION }}
+          name: Release v${{ steps.get_version.outputs.VERSION }}
           files: combat-tracker-extensions.zip
           body: |
-            ## Combat Tracker Extensions ${{ steps.get_version.outputs.VERSION }}
+            ## Combat Tracker Extensions v${{ steps.get_version.outputs.VERSION }}
 
             See [changelog.md](https://github.com/${{ github.repository }}/blob/main/changelog.md) for details.
 
